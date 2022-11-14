@@ -75,9 +75,9 @@ def test_model():
             # Save the results as .png images
 
             if orig_model == "true":
-                misc.imsave("results/full-resolution/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
+                misc.imsave("/content/gdrive/MyDrive/ColabNotebooks/PYNET/results" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
             else:
-                misc.imsave("results/full-resolution/" + str(j) + "_level_" + str(level) +
+                misc.imsave("/content/gdrive/MyDrive/ColabNotebooks/PYNET/results" + str(j) + "_level_" + str(level) +
                         "_epoch_" + str(restore_epoch) + ".png", enhanced)
 
 
