@@ -65,8 +65,8 @@ class LoadVisualData(Dataset):
 
     def __init__(self, data_dir, size, scale, level, full_resolution=False):
 
-        self.raw_dir = os.path.join(data_dir, 'test', 'huawei_full_resolution')
-
+        #self.raw_dir = os.path.join(data_dir, 'test', 'huawei_full_resolution')
+        self.raw_dir = os.path.join(data_dir)
         self.dataset_size = size
         self.scale = scale
         self.level = level
