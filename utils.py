@@ -11,16 +11,17 @@ def process_command_args(arguments):
 
     # Specifying the default parameters
 
-    level = 0
-    batch_size = 50
+    #level = 0
+    #batch_size = 50
 
-    learning_rate = 5e-5
+    #learning_rate = 5e-5
 
     restore_epoch = None
     num_train_epochs = None
 
-    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/raw_images/'
-
+    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
+    #dataset_dir = 'raw_images/'
+    
     for args in arguments:
 
         if args.startswith("level"):
@@ -68,7 +69,8 @@ def process_test_model_args(arguments):
     level = 0
     restore_epoch = None
 
-    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/raw_images/'
+    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
+    
     use_gpu = "true"
 
     orig_model = "false"
@@ -109,7 +111,6 @@ def get_last_iter(level):
         return np.max(saved_models)
     else:
         return -1
-
 
 def normalize_batch(batch):
     # Normalize batch using ImageNet mean and std
