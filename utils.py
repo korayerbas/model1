@@ -11,10 +11,10 @@ def process_command_args(arguments):
 
     # Specifying the default parameters
 
-    #level = 0
-    #batch_size = 50
+    level = 5
+    batch_size = 50
 
-    #learning_rate = 5e-5
+    learning_rate = 5e-5
 
     restore_epoch = None
     num_train_epochs = None
