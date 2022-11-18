@@ -2,7 +2,8 @@
 
 from torch.utils.data import Dataset
 from torchvision import transforms
-from scipy import misc
+#from scipy import misc
+from PIL import Image
 import numpy as np
 import imageio
 import torch
@@ -52,11 +53,15 @@ class LoadData(Dataset):
         raw_image = np.asarray(imageio.imread(os.path.join(self.raw_dir, str(idx) + '.png')))
         raw_image = extract_bayer_channels(raw_image)
         raw_image = torch.from_numpy(raw_image.transpose((2, 0, 1)))
-
-        dslr_image = misc.imread(os.path.join(self.dslr_dir, str(idx) + ".jpg"))
-        dslr_image = np.asarray(dslr_image)
-        dslr_image = np.float32(misc.imresize(dslr_image, self.scale / 2.0)) / 255.0
+        
+        im = Image.fromarray(dslr_image)
+        size = tuple((np.array(im.size) *self.scale / 2.0).astype(int))
+        dslr_image = np.float32(np.array(im.resize(size, Image.BICUBIC))/255.0)
         dslr_image = torch.from_numpy(dslr_image.transpose((2, 0, 1)))
+        
+        #dslr_image = misc.imread(os.path.join(self.dslr_dir, str(idx) + ".jpg"))
+        #dslr_image = np.asarray(dslr_image)
+        #dslr_image = np.float32(misc.imresize(dslr_image, self.scale / 2.0)) / 255.0
 
         return raw_image, dslr_image
 
@@ -65,8 +70,8 @@ class LoadVisualData(Dataset):
 
     def __init__(self, data_dir, size, scale, level, full_resolution=False):
 
-        #self.raw_dir = os.path.join(data_dir, 'test', 'huawei_full_resolution')
-        self.raw_dir = os.path.join(data_dir)
+        self.raw_dir = os.path.join(data_dir, 'test', 'huawei_full_resolution')
+        #self.raw_dir = os.path.join(data_dir)
         self.dataset_size = size
         self.scale = scale
         self.level = level
