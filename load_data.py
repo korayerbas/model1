@@ -25,7 +25,8 @@ def extract_bayer_channels(raw):
 
     RAW_combined = np.dstack((ch_B, ch_Gb, ch_R, ch_Gr))
     RAW_norm = RAW_combined.astype(np.float32) / (4 * 255)
-
+    print(RAW_norm.shape)
+    
     return RAW_norm
 
 
