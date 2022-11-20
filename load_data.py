@@ -54,6 +54,9 @@ class LoadData(Dataset):
         raw_image = extract_bayer_channels(raw_image)
         raw_image = torch.from_numpy(raw_image.transpose((2, 0, 1)))
         
+        dslr_image = imageio.imread(os.path.join(self.dslr_dir, str(idx) + ".jpg")) #jpg changed to png
+        dslr_image = np.asarray(dslr_image)
+        
         im = Image.fromarray(dslr_image)
         size = tuple((np.array(im.size) *self.scale / 2.0).astype(int))
         dslr_image = np.float32(np.array(im.resize(size, Image.BICUBIC))/255.0)
