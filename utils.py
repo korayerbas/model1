@@ -19,7 +19,7 @@ def process_command_args(arguments):
     restore_epoch = None
     num_train_epochs = None
 
-    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
+    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
     #dataset_dir = 'raw_images/'
     
     for args in arguments:
@@ -69,7 +69,8 @@ def process_test_model_args(arguments):
     level = 0
     restore_epoch = None
 
-    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
+    #dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
+    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
     
     use_gpu = "true"
 
