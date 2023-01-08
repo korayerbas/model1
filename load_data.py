@@ -35,12 +35,12 @@ class LoadData(Dataset):
     def __init__(self, dataset_dir, dataset_size, dslr_scale, test=False):
 
         if test:
-            self.raw_dir = os.path.join(dataset_dir, 'test', 'huawei_raw')
-            self.dslr_dir = os.path.join(dataset_dir, 'test', 'canon')
+            self.raw_dir = os.path.join(dataset_dir, 'test', 'raw')
+            self.dslr_dir = os.path.join(dataset_dir, 'test', 'jpg_img')
             self.dataset_size = dataset_size
         else:
-            self.raw_dir = os.path.join(dataset_dir, 'train', 'huawei_raw')
-            self.dslr_dir = os.path.join(dataset_dir, 'train', 'canon')
+            self.raw_dir = os.path.join(dataset_dir, 'train', 'pynet_fullres_cropped_raw')
+            self.dslr_dir = os.path.join(dataset_dir, 'train', 'pynet_fullres_cropped_jpg')
 
         self.dataset_size = dataset_size
         self.scale = dslr_scale
@@ -74,7 +74,7 @@ class LoadVisualData(Dataset):
 
     def __init__(self, data_dir, size, scale, level, full_resolution=False):
 
-        self.raw_dir = os.path.join(data_dir, 'test', 'huawei_full_resolution')
+        self.raw_dir = os.path.join(data_dir,'test','full_resolution')
         #self.raw_dir = os.path.join(data_dir)
         self.dataset_size = size
         self.scale = scale
