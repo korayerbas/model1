@@ -23,14 +23,14 @@ torch.manual_seed(0)
 
 # Processing command arguments
 
-#level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = 5, 10, 5e-4, None, 8, '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
-level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = process_command_args(sys.argv)
+level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = 5, 50, 5e-4, None, 8, '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
+#level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = process_command_args(sys.argv)
 dslr_scale = float(1) / (2 ** (level - 1))
 
 # Dataset size
 
-TRAIN_SIZE = 46839
-TEST_SIZE = 1204
+TRAIN_SIZE = 11760
+TEST_SIZE = 40
 
 
 def train_model():
@@ -65,9 +65,10 @@ def train_model():
     # Restoring the variables
 
     if level < 5:
-        generator.load_state_dict(torch.load("models/pynet_level_" + str(level + 1) +
-                                             "owntrain_epoch_" + str(restore_epoch) + ".pth"), strict=False)
-
+        #generator.load_state_dict(torch.load("models/pynet_level_" + str(level + 1) +
+        #                                     "owntrain_epoch_" + str(restore_epoch) + ".pth"), strict=False)
+        generator.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/PYNET/models/pynet_level_" + str(level) +
+                                             "_epoch_" + str(restore_epoch) + ".pth"), strict=False) # "level+1" changed to level
     # Losses
 
     VGG_19 = vgg_19(device)
@@ -123,7 +124,7 @@ def train_model():
                 # Save the model that corresponds to the current epoch
 
                 generator.eval().cpu()
-                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/PYNET/models/pynet_level_" + str(level) + "owntrain_epoch_" + str(epoch) + ".pth")
+                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level) + "_epoch_" + str(epoch) + ".pth")
                 generator.to(device).train()
 
                 # Save visual results for several test images
@@ -196,4 +197,3 @@ def train_model():
 
 if __name__ == '__main__':
     train_model()
-
