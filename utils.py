@@ -11,7 +11,7 @@ def process_command_args(arguments):
 
     # Specifying the default parameters
 
-    level = 5
+    level = 3
     batch_size = 50
 
     learning_rate = 5e-5
