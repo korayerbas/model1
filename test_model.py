@@ -1,6 +1,5 @@
 # Copyright 2020 by Andrey Ignatov. All Rights Reserved.
 
-from scipy import misc
 import numpy as np
 import sys
 import os
@@ -12,6 +11,7 @@ import torch
 from load_data import LoadVisualData
 from model import PyNET
 import utils
+import imageio
 
 to_image = transforms.Compose([transforms.ToPILImage()])
 
@@ -30,7 +30,7 @@ def test_model():
 
     # Creating dataset loaders
 
-    visual_dataset = LoadVisualData(dataset_dir, 10, dslr_scale, level, full_resolution=True)
+    visual_dataset = LoadVisualData(dataset_dir, 8, dslr_scale, level, full_resolution=True)
     visual_loader = DataLoader(dataset=visual_dataset, batch_size=1, shuffle=False, num_workers=0,
                                pin_memory=True, drop_last=False)
 
@@ -40,10 +40,9 @@ def test_model():
     model = torch.nn.DataParallel(model)
 
     if orig_model == "true":
-        model.load_state_dict(torch.load("models/original/pynet_level_0.pth"), strict=True)
+        model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/PYNET/models/original/pynet_level_0.pth"), strict=True)
     else:
-        model.load_state_dict(torch.load("models/pynet_level_" + str(level) +
-                                             "_epoch_" + str(restore_epoch) + ".pth"), strict=True)
+        model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_0_epoch_57.pth"), strict=True)
 
     if use_gpu == "true":
         model.half()
@@ -75,9 +74,9 @@ def test_model():
             # Save the results as .png images
 
             if orig_model == "true":
-                misc.imsave("/content/gdrive/MyDrive/ColabNotebooks/PYNET/results" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
+                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
             else:
-                misc.imsave("/content/gdrive/MyDrive/ColabNotebooks/PYNET/results" + str(j) + "_level_" + str(level) +
+                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results" + str(j) + "_level_" + str(level) +
                         "_epoch_" + str(restore_epoch) + ".png", enhanced)
 
 
