@@ -72,10 +72,11 @@ class LoadData(Dataset):
 
 class LoadVisualData(Dataset):
 
-    def __init__(self, data_dir, size, scale, level, full_resolution=False):
+    def __init__(self, data_dir, size, scale, level, full_resolution=True):
+        #self.raw_dir = os.path.join(data_dir,'test','full_resolution')
+        self.raw_dir = data_dir
+        print("raw_dir: ",self.raw_dir)
 
-        self.raw_dir = os.path.join(data_dir,'test','full_resolution')
-        #self.raw_dir = os.path.join(data_dir)
         self.dataset_size = size
         self.scale = scale
         self.level = level
