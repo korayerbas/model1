@@ -74,9 +74,9 @@ def test_model():
             # Save the results as .png images
 
             if orig_model == "true":
-                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
+                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
             else:
-                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results" + str(j) + "_level_" + str(level) +
+                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results/" + str(j) + "_level_" + str(level) +
                         "_epoch_" + str(restore_epoch) + ".png", enhanced)
 
 
