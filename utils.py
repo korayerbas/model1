@@ -67,11 +67,10 @@ def process_command_args(arguments):
 def process_test_model_args(arguments):
 
     level = 0
-    restore_epoch = None
+    restore_epoch = 57
 
     #dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
-    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
-    
+    dataset_dir = "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_resolution/"
     use_gpu = "true"
 
     orig_model = "false"
