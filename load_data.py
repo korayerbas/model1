@@ -51,11 +51,11 @@ class LoadData(Dataset):
 
     def __getitem__(self, idx):
 
-        raw_image = np.asarray(imageio.imread(os.path.join(self.raw_dir, str(idx) + '.png')))
+        raw_image = np.asarray(imageio.imread(os.path.join(self.raw_dir, str(idx)+ ".png"))) 
         raw_image = extract_bayer_channels(raw_image)
         raw_image = torch.from_numpy(raw_image.transpose((2, 0, 1)))
         
-        dslr_image = imageio.imread(os.path.join(self.dslr_dir, str(idx) + ".jpg")) #jpg changed to png
+        dslr_image = imageio.imread(os.path.join(self.dslr_dir, str(idx) + ".jpg")) 
         dslr_image = np.asarray(dslr_image)
         
         im = Image.fromarray(dslr_image)
@@ -73,8 +73,8 @@ class LoadData(Dataset):
 class LoadVisualData(Dataset):
 
     def __init__(self, data_dir, size, scale, level, full_resolution=True):
-        #self.raw_dir = os.path.join(data_dir,'test','full_resolution')
-        self.raw_dir = data_dir
+        self.raw_dir = os.path.join(data_dir,'test','full_resolution')
+        #self.raw_dir = data_dir
         print("raw_dir: ",self.raw_dir)
 
         self.dataset_size = size
@@ -97,7 +97,7 @@ class LoadVisualData(Dataset):
         return self.dataset_size
 
     def __getitem__(self, idx):
-
+        print('idx: ', idx) #self control
         raw_image = np.asarray(imageio.imread(os.path.join(self.raw_dir, self.test_images[idx])))
         raw_image = extract_bayer_channels(raw_image)
 
