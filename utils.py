@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import os
 
-NUM_DEFAULT_TRAIN_EPOCHS = [50, 25, 17, 17, 8, 8]
+NUM_DEFAULT_TRAIN_EPOCHS = [60, 25, 17, 17, 8, 8]
 
 
 def process_command_args(arguments):
@@ -73,7 +73,7 @@ def process_test_model_args(arguments):
     dataset_dir = "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset"
     use_gpu = "true"
 
-    orig_model = "false"
+    orig_model = "true"
 
     for args in arguments:
 
