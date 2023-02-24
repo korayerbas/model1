@@ -16,6 +16,7 @@ import imageio
 to_image = transforms.Compose([transforms.ToPILImage()])
 
 level, restore_epoch, dataset_dir, use_gpu, orig_model = utils.process_test_model_args(sys.argv)
+#level, restore_epoch, dataset_dir, use_gpu, orig_model =  0, 57, '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset', "true", "true"
 dslr_scale = float(1) / (2 ** (level - 1))
 
 
@@ -42,7 +43,7 @@ def test_model():
     if orig_model == "true":
         model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/PYNET/models/original/pynet_level_0.pth"), strict=True)
     else:
-        model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_0_epoch_57.pth"), strict=True)
+        model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_0_epoch_57.pth"), strict=True)
 
     if use_gpu == "true":
         model.half()
@@ -74,9 +75,9 @@ def test_model():
             # Save the results as .png images
 
             if orig_model == "true":
-                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
+                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset/full_res_results/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
             else:
-                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_res_results/" + str(j) + "_level_" + str(level) +
+                imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset/full_res_results/" + str(j) + "_level_" + str(level) +
                         "_epoch_" + str(restore_epoch) + ".png", enhanced)
 
 
