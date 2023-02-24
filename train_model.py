@@ -23,13 +23,13 @@ torch.manual_seed(0)
 
 # Processing command arguments
 
-level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = 3, 50, 5e-4, None, 17, '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
+level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = 0, 3, 5e-4, 57, 60, '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
 #level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = process_command_args(sys.argv)
 dslr_scale = float(1) / (2 ** (level - 1))
 
 # Dataset size
 
-TRAIN_SIZE = 11760
+TRAIN_SIZE = 12600
 TEST_SIZE = 40
 
 
@@ -67,7 +67,7 @@ def train_model():
     if level < 5:
         #generator.load_state_dict(torch.load("models/pynet_level_" + str(level + 1) +
         #                                     "owntrain_epoch_" + str(restore_epoch) + ".pth"), strict=False)
-        generator.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level+1) +
+        generator.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level) +
                                              "_epoch_" + str(restore_epoch) + ".pth"), strict=False) # "level+1" changed to level
     # Losses
 
@@ -124,7 +124,7 @@ def train_model():
                 # Save the model that corresponds to the current epoch
 
                 generator.eval().cpu()
-                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level) + "_epoch_" + str(epoch) + ".pth")
+                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level) + "_epoch_" + str(epoch+58) + ".pth")
                 generator.to(device).train()
 
                 # Save visual results for several test images
@@ -144,7 +144,7 @@ def train_model():
                         enhanced = np.asarray(to_image(torch.squeeze(enhanced.detach().cpu())))
 
                         imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/PYNET/results/pynet_img_" + str(j) + "_level_" + str(level) + "_epoch_" +
-                                        str(epoch) + ".jpg", enhanced)
+                                        str(epoch+58) + ".jpg", enhanced)
 
                 # Evaluate the model
 
