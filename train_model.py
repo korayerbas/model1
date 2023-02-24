@@ -23,8 +23,8 @@ torch.manual_seed(0)
 
 # Processing command arguments
 
-level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = 0, 3, 5e-4, 57, 60, '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
-#level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = process_command_args(sys.argv)
+#level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = 0, 3, 5e-4, 57, 60, '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
+level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir = process_command_args(sys.argv)
 dslr_scale = float(1) / (2 ** (level - 1))
 
 # Dataset size
@@ -67,7 +67,7 @@ def train_model():
     if level < 5:
         #generator.load_state_dict(torch.load("models/pynet_level_" + str(level + 1) +
         #                                     "owntrain_epoch_" + str(restore_epoch) + ".pth"), strict=False)
-        generator.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level) +
+        generator.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_" + str(level) +
                                              "_epoch_" + str(restore_epoch) + ".pth"), strict=False) # "level+1" changed to level
     # Losses
 
@@ -124,7 +124,7 @@ def train_model():
                 # Save the model that corresponds to the current epoch
 
                 generator.eval().cpu()
-                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/model/pynet_level_" + str(level) + "_epoch_" + str(epoch+58) + ".pth")
+                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_" + str(level) + "_epoch_" + str(epoch+58) + ".pth")
                 generator.to(device).train()
 
                 # Save visual results for several test images
