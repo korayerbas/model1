@@ -11,15 +11,15 @@ def process_command_args(arguments):
 
     # Specifying the default parameters
 
-    level = 3
-    batch_size = 50
+    level = 0
+    batch_size = 3
 
     learning_rate = 5e-5
 
-    restore_epoch = None
-    num_train_epochs = None
+    restore_epoch = 57
+    num_train_epochs = 60
 
-    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset'
+    dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset'
     #dataset_dir = 'raw_images/'
     
     for args in arguments:
@@ -70,7 +70,7 @@ def process_test_model_args(arguments):
     restore_epoch = 57
 
     #dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
-    dataset_dir = "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres_dataset/test/full_resolution/"
+    dataset_dir = "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset"
     use_gpu = "true"
 
     orig_model = "false"
