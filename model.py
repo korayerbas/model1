@@ -1,8 +1,7 @@
-# Copyright 2020 by Andrey Ignatov. All Rights Reserved.
+s# Copyright 2020 by Andrey Ignatov. All Rights Reserved.
 
 import torch.nn as nn
 import torch
-
 
 class PyNET(nn.Module):
 
@@ -19,200 +18,91 @@ class PyNET(nn.Module):
 
         self.conv_l3_d1 = ConvMultiBlock(64, 128, 3, instance_norm=instance_norm)
         self.pool3 = nn.MaxPool2d(2, 2)
+        
+        # -------------------------------------
 
         self.conv_l4_d1 = ConvMultiBlock(128, 256, 3, instance_norm=instance_norm)
-        self.pool4 = nn.MaxPool2d(2, 2)
-
-        # -------------------------------------
-
-        self.conv_l5_d1 = ConvMultiBlock(256, 512, 3, instance_norm=instance_norm)
-        self.conv_l5_d2 = ConvMultiBlock(512, 512, 3, instance_norm=instance_norm)
-        self.conv_l5_d3 = ConvMultiBlock(512, 512, 3, instance_norm=instance_norm)
-        self.conv_l5_d4 = ConvMultiBlock(512, 512, 3, instance_norm=instance_norm)
-
-        self.conv_t4a = UpsampleConvLayer(512, 256, 3)
-        self.conv_t4b = UpsampleConvLayer(512, 256, 3)
-
-        self.conv_l5_out = ConvLayer(512, 3, kernel_size=3, stride=1, relu=False)
-        self.output_l5 = nn.Sigmoid()
-
-        # -------------------------------------
-
-        self.conv_l4_d3 = ConvMultiBlock(512, 256, 3, instance_norm=instance_norm)
+        self.conv_l4_d2 = ConvMultiBlock(256, 256, 3, instance_norm=instance_norm)
+        self.conv_l4_d3 = ConvMultiBlock(256, 256, 3, instance_norm=instance_norm)
         self.conv_l4_d4 = ConvMultiBlock(256, 256, 3, instance_norm=instance_norm)
-        self.conv_l4_d5 = ConvMultiBlock(256, 256, 3, instance_norm=instance_norm)
-        self.conv_l4_d6 = ConvMultiBlock(256, 256, 3, instance_norm=instance_norm)
-        self.conv_l4_d8 = ConvMultiBlock(512, 256, 3, instance_norm=instance_norm)
 
-        self.conv_t3a = UpsampleConvLayer(256, 128, 3)
         self.conv_t3b = UpsampleConvLayer(256, 128, 3)
 
         self.conv_l4_out = ConvLayer(256, 3, kernel_size=3, stride=1, relu=False)
         self.output_l4 = nn.Sigmoid()
 
         # -------------------------------------
+        self.conv_l3_d3 = ConvMultiBlock(256, 128, 3, instance_norm=instance_norm)
 
-        self.conv_l3_d3 = ConvMultiBlock(256, 128, 5, instance_norm=instance_norm)
-        self.conv_l3_d4 = ConvMultiBlock(256, 128, 5, instance_norm=instance_norm)
-        self.conv_l3_d5 = ConvMultiBlock(256, 128, 5, instance_norm=instance_norm)
-        self.conv_l3_d6 = ConvMultiBlock(256, 128, 5, instance_norm=instance_norm)
-        self.conv_l3_d8 = ConvMultiBlock(512, 128, 3, instance_norm=instance_norm)
-
-        self.conv_t2a = UpsampleConvLayer(128, 64, 3)
         self.conv_t2b = UpsampleConvLayer(128, 64, 3)
 
         self.conv_l3_out = ConvLayer(128, 3, kernel_size=3, stride=1, relu=False)
         self.output_l3 = nn.Sigmoid()
 
         # -------------------------------------
-
-        self.conv_l2_d3 = ConvMultiBlock(128, 64, 5, instance_norm=instance_norm)
-        self.conv_l2_d5 = ConvMultiBlock(192, 64, 7, instance_norm=instance_norm)
-        self.conv_l2_d6 = ConvMultiBlock(192, 64, 7, instance_norm=instance_norm)
-        self.conv_l2_d7 = ConvMultiBlock(192, 64, 7, instance_norm=instance_norm)
-        self.conv_l2_d8 = ConvMultiBlock(192, 64, 7, instance_norm=instance_norm)
-        self.conv_l2_d10 = ConvMultiBlock(256, 64, 5, instance_norm=instance_norm)
-        self.conv_l2_d12 = ConvMultiBlock(192, 64, 3, instance_norm=instance_norm)
-
-        self.conv_t1a = UpsampleConvLayer(64, 32, 3)
+        self.conv_l2_d3 = ConvMultiBlock(128, 64, 3, instance_norm=instance_norm)
+        
         self.conv_t1b = UpsampleConvLayer(64, 32, 3)
-
         self.conv_l2_out = ConvLayer(64, 3, kernel_size=3, stride=1, relu=False)
         self.output_l2 = nn.Sigmoid()
 
         # -------------------------------------
-
-        self.conv_l1_d3 = ConvMultiBlock(64, 32, 5, instance_norm=False)
-        self.conv_l1_d5 = ConvMultiBlock(96, 32, 7, instance_norm=instance_norm_level_1)
-
-        self.conv_l1_d6 = ConvMultiBlock(96, 32, 9, instance_norm=instance_norm_level_1)
-        self.conv_l1_d7 = ConvMultiBlock(128, 32, 9, instance_norm=instance_norm_level_1)
-        self.conv_l1_d8 = ConvMultiBlock(128, 32, 9, instance_norm=instance_norm_level_1)
-        self.conv_l1_d9 = ConvMultiBlock(128, 32, 9, instance_norm=instance_norm_level_1)
-
-        self.conv_l1_d10 = ConvMultiBlock(128, 32, 7, instance_norm=instance_norm_level_1)
-        self.conv_l1_d12 = ConvMultiBlock(128, 32, 5, instance_norm=instance_norm_level_1)
-        self.conv_l1_d14 = ConvMultiBlock(128, 32, 3, instance_norm=False)
-
+        self.conv_l1_d3 = ConvMultiBlock(64, 32, 3, instance_norm=instance_norm)
+        
+        self.conv_t0b = UpsampleConvLayer(32, 16, 3)
         self.conv_l1_out = ConvLayer(32, 3, kernel_size=3, stride=1, relu=False)
         self.output_l1 = nn.Sigmoid()
-
-        self.conv_t0 = UpsampleConvLayer(32, 16, 3)
 
         # -------------------------------------
 
         self.conv_l0_d1 = ConvLayer(16, 3, kernel_size=3, stride=1, relu=False)
         self.output_l0 = nn.Sigmoid()
 
-    def level_5(self, pool4):
-
-        conv_l5_d1 = self.conv_l5_d1(pool4)
-        conv_l5_d2 = self.conv_l5_d2(conv_l5_d1)
-        conv_l5_d3 = self.conv_l5_d3(conv_l5_d2)
-        conv_l5_d4 = self.conv_l5_d4(conv_l5_d3)
-
-        conv_t4a = self.conv_t4a(conv_l5_d4)
-        conv_t4b = self.conv_t4b(conv_l5_d4)
-
-        conv_l5_out = self.conv_l5_out(conv_l5_d4)
-        output_l5 = self.output_l5(conv_l5_out)
-
-        return output_l5, conv_t4a, conv_t4b
-
-    def level_4(self, conv_l4_d1, conv_t4a, conv_t4b):
-
-        conv_l4_d2 = torch.cat([conv_l4_d1, conv_t4a], 1)
-
+    def level_4(self, pool3):
+        
+        conv_l4_d1 = self.conv_l4_d1(pool3)
+        conv_l4_d2 = self.conv_l4_d2(conv_l4_d1)
         conv_l4_d3 = self.conv_l4_d3(conv_l4_d2)
-        conv_l4_d4 = self.conv_l4_d4(conv_l4_d3) + conv_l4_d3
-        conv_l4_d5 = self.conv_l4_d5(conv_l4_d4) + conv_l4_d4
-        conv_l4_d6 = self.conv_l4_d6(conv_l4_d5)
-
-        conv_l4_d7 = torch.cat([conv_l4_d6, conv_t4b], 1)
-        conv_l4_d8 = self.conv_l4_d8(conv_l4_d7)
-
-        conv_t3a = self.conv_t3a(conv_l4_d8)
-        conv_t3b = self.conv_t3b(conv_l4_d8)
-
-        conv_l4_out = self.conv_l4_out(conv_l4_d8)
+        conv_l4_d4 = self.conv_l4_d4(conv_l4_d3)
+        conv_t3b = self.conv_t4b(conv_l4_d4)
+        conv_l4_out = self.conv_l4_out(conv_l4_d4)
         output_l4 = self.output_l4(conv_l4_out)
 
-        return output_l4, conv_t3a, conv_t3b
+        return output_l4, conv_t3b
 
-    def level_3(self, conv_l3_d1, conv_t3a, conv_t3b):
+    def level_3(self, conv_l3_d1, conv_t3b):
 
-        conv_l3_d2 = torch.cat([conv_l3_d1, conv_t3a], 1)
-
-        conv_l3_d3 = self.conv_l3_d3(conv_l3_d2) + conv_l3_d2
-        conv_l3_d4 = self.conv_l3_d4(conv_l3_d3) + conv_l3_d3
-        conv_l3_d5 = self.conv_l3_d5(conv_l3_d4) + conv_l3_d4
-        conv_l3_d6 = self.conv_l3_d6(conv_l3_d5)
-
-        conv_l3_d7 = torch.cat([conv_l3_d6, conv_l3_d1, conv_t3b], 1)
-        conv_l3_d8 = self.conv_l3_d8(conv_l3_d7)
-
-        conv_t2a = self.conv_t2a(conv_l3_d8)
-        conv_t2b = self.conv_t2b(conv_l3_d8)
-
-        conv_l3_out = self.conv_l3_out(conv_l3_d8)
+        conv_l3_d2 = torch.cat([conv_l3_d1, conv_t3b], 1)
+        conv_l3_d3 = self.conv_l3_d3(conv_l3_d2)
+        conv_t2b = self.conv_t2b(conv_l3_d3)
+        conv_l3_out = self.conv_l3_out(conv_l3_d3)
         output_l3 = self.output_l3(conv_l3_out)
+        
+        return output_l3, conv_t2b
 
-        return output_l3, conv_t2a, conv_t2b
+    def level_2(self, conv_l2_d1, conv_t2b):
 
-    def level_2(self, conv_l2_d1, conv_t2a, conv_t2b):
-
-        conv_l2_d2 = torch.cat([conv_l2_d1, conv_t2a], 1)
+        conv_l2_d2 = torch.cat([conv_l2_d1, conv_t2b], 1)
         conv_l2_d3 = self.conv_l2_d3(conv_l2_d2)
-        conv_l2_d4 = torch.cat([conv_l2_d3, conv_l2_d1], 1)
-
-        conv_l2_d5 = self.conv_l2_d5(conv_l2_d4) + conv_l2_d4
-        conv_l2_d6 = self.conv_l2_d6(conv_l2_d5) + conv_l2_d5
-        conv_l2_d7 = self.conv_l2_d7(conv_l2_d6) + conv_l2_d6
-        conv_l2_d8 = self.conv_l2_d8(conv_l2_d7)
-        conv_l2_d9 = torch.cat([conv_l2_d8, conv_l2_d1], 1)
-
-        conv_l2_d10 = self.conv_l2_d10(conv_l2_d9)
-        conv_l2_d11 = torch.cat([conv_l2_d10, conv_t2b], 1)
-        conv_l2_d12 = self.conv_l2_d12(conv_l2_d11)
-
-        conv_t1a = self.conv_t1a(conv_l2_d12)
-        conv_t1b = self.conv_t1b(conv_l2_d12)
-
-        conv_l2_out = self.conv_l2_out(conv_l2_d12)
+        conv_t1b = self.conv_t1b(conv_l2_d3)
+        conv_l2_out = self.conv_l2_out(conv_l2_d3)
         output_l2 = self.output_l2(conv_l2_out)
 
-        return output_l2, conv_t1a, conv_t1b
+        return output_l2, conv_t1b
 
-    def level_1(self, conv_l1_d1, conv_t1a, conv_t1b):
+    def level_1(self, conv_l1_d1, conv_t1b):
 
-        conv_l1_d2 = torch.cat([conv_l1_d1, conv_t1a], 1)
+        conv_l1_d2 = torch.cat([conv_l1_d1, conv_t1b], 1)
         conv_l1_d3 = self.conv_l1_d3(conv_l1_d2)
-        conv_l1_d4 = torch.cat([conv_l1_d3, conv_l1_d1], 1)
-
-        conv_l1_d5 = self.conv_l1_d5(conv_l1_d4)
-
-        conv_l1_d6 = self.conv_l1_d6(conv_l1_d5)
-        conv_l1_d7 = self.conv_l1_d7(conv_l1_d6) + conv_l1_d6
-        conv_l1_d8 = self.conv_l1_d8(conv_l1_d7) + conv_l1_d7
-        conv_l1_d9 = self.conv_l1_d9(conv_l1_d8) + conv_l1_d8
-
-        conv_l1_d10 = self.conv_l1_d10(conv_l1_d9)
-        conv_l1_d11 = torch.cat([conv_l1_d10, conv_l1_d1], 1)
-
-        conv_l1_d12 = self.conv_l1_d12(conv_l1_d11)
-        conv_l1_d13 = torch.cat([conv_l1_d12, conv_t1b, conv_l1_d1], 1)
-
-        conv_l1_d14 = self.conv_l1_d14(conv_l1_d13)
-        conv_t0 = self.conv_t0(conv_l1_d14)
-
-        conv_l1_out = self.conv_l1_out(conv_l1_d14)
+        conv_t0b = self.conv_t0b(conv_l1_d3)
+        conv_l1_out = self.conv_l1_out(conv_l1_d3)
         output_l1 = self.output_l1(conv_l1_out)
 
-        return output_l1, conv_t0
+        return output_l1, conv_t0b
 
-    def level_0(self, conv_t0):
+    def level_0(self, conv_t0b):
 
-        conv_l0_d1 = self.conv_l0_d1(conv_t0)
+        conv_l0_d1 = self.conv_l0_d1(conv_t0b)
         output_l0 = self.output_l0(conv_l0_d1)
 
         return output_l0
@@ -228,21 +118,16 @@ class PyNET(nn.Module):
         conv_l3_d1 = self.conv_l3_d1(pool2)
         pool3 = self.pool3(conv_l3_d1)
 
-        conv_l4_d1 = self.conv_l4_d1(pool3)
-        pool4 = self.pool4(conv_l4_d1)
+        output_l4, conv_t3b =self.level_4(pool3)
 
-        output_l5, conv_t4a, conv_t4b = self.level_5(pool4)
-
-        if self.level < 5:
-            output_l4, conv_t3a, conv_t3b = self.level_4(conv_l4_d1, conv_t4a, conv_t4b)
         if self.level < 4:
-            output_l3, conv_t2a, conv_t2b = self.level_3(conv_l3_d1, conv_t3a, conv_t3b)
+            output_l3, conv_t2b = self.level_3(conv_l3_d1, conv_t3b)
         if self.level < 3:
-            output_l2, conv_t1a, conv_t1b = self.level_2(conv_l2_d1, conv_t2a, conv_t2b)
+            output_l2, conv_t1b = self.level_2(conv_l2_d1, conv_t2b)
         if self.level < 2:
-            output_l1, conv_t0 = self.level_1(conv_l1_d1, conv_t1a, conv_t1b)
+            output_l1, conv_t0b = self.level_1(conv_l1_d1, conv_t1b)
         if self.level < 1:
-            output_l0 = self.level_0(conv_t0)
+            output_l0 = self.level_0(conv_t0b)
 
         if self.level == 0:
             enhanced = output_l0
@@ -254,8 +139,6 @@ class PyNET(nn.Module):
             enhanced = output_l3
         if self.level == 4:
             enhanced = output_l4
-        if self.level == 5:
-            enhanced = output_l5
 
         return enhanced
 
