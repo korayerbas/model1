@@ -1,4 +1,4 @@
-s# Copyright 2020 by Andrey Ignatov. All Rights Reserved.
+# Copyright 2020 by Andrey Ignatov. All Rights Reserved.
 
 import torch.nn as nn
 import torch
@@ -64,7 +64,7 @@ class PyNET(nn.Module):
         conv_l4_d2 = self.conv_l4_d2(conv_l4_d1)
         conv_l4_d3 = self.conv_l4_d3(conv_l4_d2)
         conv_l4_d4 = self.conv_l4_d4(conv_l4_d3)
-        conv_t3b = self.conv_t4b(conv_l4_d4)
+        conv_t3b = self.conv_t3b(conv_l4_d4)
         conv_l4_out = self.conv_l4_out(conv_l4_d4)
         output_l4 = self.output_l4(conv_l4_out)
 
