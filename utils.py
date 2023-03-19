@@ -42,7 +42,7 @@ def process_command_args(arguments):
         if args.startswith("dataset_dir"):
             dataset_dir = args.split("=")[1]
 
-    if restore_epoch is None and level < 5:
+    if restore_epoch is None and level < 4:
         restore_epoch = get_last_iter(level + 1)
         if restore_epoch == -1:
             print("Error: Cannot find any pre-trained models for PyNET's level " + str(level + 1) + ".")
