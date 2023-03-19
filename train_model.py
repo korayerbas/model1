@@ -97,20 +97,17 @@ def train_model():
 
             # VGG Loss
 
-            if level < 5:
-                enhanced_vgg = VGG_19(normalize_batch(enhanced))
-                target_vgg = VGG_19(normalize_batch(y))
-                loss_content = MSE_loss(enhanced_vgg, target_vgg)
+            enhanced_vgg = VGG_19(normalize_batch(enhanced))
+            target_vgg = VGG_19(normalize_batch(y))
+            loss_content = MSE_loss(enhanced_vgg, target_vgg)
 
             # Total Loss
 
-            if level == 5 or level == 4:
-                total_loss = loss_mse
+            if level == 4:
+                total_loss = loss_content
             if level == 3 or level == 2:
                 total_loss = loss_mse * 10 + loss_content
-            if level == 1:
-                total_loss = loss_mse * 10 + loss_content
-            if level == 0:
+            if level == 1 or level == 0:
                 loss_ssim = MS_SSIM(enhanced, y)
                 total_loss = loss_mse + loss_content + (1 - loss_ssim) * 0.4
 
