@@ -247,4 +247,3 @@ class UpsampleConvLayer(torch.nn.Module):
             out = self.relu(out)
 
         return out
-
