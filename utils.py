@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import os
 
-NUM_DEFAULT_TRAIN_EPOCHS = [60, 25, 17, 17, 8, 8]
+NUM_DEFAULT_TRAIN_EPOCHS = [60, 35, 20, 20, 12]
 
 
 def process_command_args(arguments):
