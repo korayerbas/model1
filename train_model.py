@@ -121,7 +121,7 @@ def train_model():
                 # Save the model that corresponds to the current epoch
 
                 generator.eval().cpu()
-                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_" + str(level) + "_epoch_" + str(epoch+58) + ".pth")
+                torch.save(generator.state_dict(), "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_" + str(level) + "_epoch_" + str(epoch) + "_lght.pth")
                 generator.to(device).train()
 
                 # Save visual results for several test images
@@ -141,7 +141,7 @@ def train_model():
                         enhanced = np.asarray(to_image(torch.squeeze(enhanced.detach().cpu())))
 
                         imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/PYNET/results/pynet_img_" + str(j) + "_level_" + str(level) + "_epoch_" +
-                                        str(epoch+58) + ".jpg", enhanced)
+                                        str(epoch) + "_lght.jpg", enhanced)
 
                 # Evaluate the model
 
