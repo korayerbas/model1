@@ -64,7 +64,7 @@ def train_model():
 
     # Restoring the variables
 
-    if level < 5:
+    if level < 4:
         #generator.load_state_dict(torch.load("models/pynet_level_" + str(level + 1) +
         #                                     "owntrain_epoch_" + str(restore_epoch) + ".pth"), strict=False)
         generator.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_" + str(level) +
