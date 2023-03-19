@@ -169,7 +169,7 @@ def train_model():
                         if level < 2:
                             loss_ssim_eval += MS_SSIM(y, enhanced)
 
-                        if level < 5:
+                        if level < 4:
                             enhanced_vgg_eval = VGG_19(normalize_batch(enhanced)).detach()
                             target_vgg_eval = VGG_19(normalize_batch(y)).detach()
 
@@ -183,7 +183,7 @@ def train_model():
                 if level < 2:
                     print("Epoch %d, mse: %.4f, psnr: %.4f, vgg: %.4f, ms-ssim: %.4f" % (epoch,
                             loss_mse_eval, loss_psnr_eval, loss_vgg_eval, loss_ssim_eval))
-                elif level < 5:
+                elif level < 4:
                     print("Epoch %d, mse: %.4f, psnr: %.4f, vgg: %.4f" % (epoch,
                             loss_mse_eval, loss_psnr_eval, loss_vgg_eval))
                 else:
