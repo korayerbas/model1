@@ -43,7 +43,7 @@ def test_model():
     if orig_model == "true":
         model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/PYNET/models/original/pynet_level_0.pth"), strict=True)
     else:
-        model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_0_epoch_57.pth"), strict=True)
+        model.load_state_dict(torch.load("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/model/pynet_level_0_epoch_59_lght.pth"), strict=True)
 
     if use_gpu == "true":
         model.half()
@@ -78,7 +78,7 @@ def test_model():
                 imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset/full_res_results/" + str(j) + "_level_" + str(level) + "_orig.png", enhanced)
             else:
                 imageio.imwrite("/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset/full_res_results/" + str(j) + "_level_" + str(level) +
-                        "_epoch_" + str(restore_epoch) + ".png", enhanced)
+                        "_epoch_" + str(restore_epoch) + "_lght.png", enhanced)
 
 
 if __name__ == '__main__':
