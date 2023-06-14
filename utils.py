@@ -4,28 +4,16 @@ import numpy as np
 import sys
 import os
 
-NUM_DEFAULT_TRAIN_EPOCHS = [60, 35, 20, 20, 12]
-
-
 def process_command_args(arguments):
-
     # Specifying the default parameters
-
-    level = 4
-    batch_size = 50
-
-    learning_rate = 5e-5
-
-    restore_epoch = None
-    num_train_epochs = 12
-
+    level=2
+    batch_size = 1
+    learning_rate = 5e-4
+    restore_epoch = 0
+    num_train_epochs = 1
     dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset'
-    #dataset_dir = 'raw_images/'
-    
+        
     for args in arguments:
-
-        if args.startswith("level"):
-            level = int(args.split("=")[1])
 
         if args.startswith("batch_size"):
             batch_size = int(args.split("=")[1])
@@ -41,44 +29,28 @@ def process_command_args(arguments):
 
         if args.startswith("dataset_dir"):
             dataset_dir = args.split("=")[1]
-
-    if restore_epoch is None and level < 4:
-        restore_epoch = get_last_iter(level + 1)
-        if restore_epoch == -1:
-            print("Error: Cannot find any pre-trained models for PyNET's level " + str(level + 1) + ".")
-            print("Aborting the training.")
-            sys.exit()
-
-    if num_train_epochs is None:
-        num_train_epochs = NUM_DEFAULT_TRAIN_EPOCHS[level]
-
-    print("The following parameters will be applied for CNN training:")
-
-    print("Training level: " + str(level))
-    print("Batch size: " + str(batch_size))
-    print("Learning rate: " + str(learning_rate))
-    print("Training epochs: " + str(num_train_epochs))
-    print("Restore epoch: " + str(restore_epoch))
-    print("Path to the dataset: " + dataset_dir)
+    
+    #print("Level: " + str(level))        
+    #print("The following parameters will be applied for CNN training:")
+    #print("Batch size: " + str(batch_size))
+    #print("Learning rate: " + str(learning_rate))
+    #print("Training epochs: " + str(num_train_epochs))
+    #print("Restore epoch: " + str(restore_epoch))
+    #print("Path to the dataset: " + dataset_dir)
 
     return level, batch_size, learning_rate, restore_epoch, num_train_epochs, dataset_dir
 
-
 def process_test_model_args(arguments):
+    level = 1 
+    restore_epoch = None
 
-    level = 0
-    restore_epoch = 57
-
-    #dataset_dir = '/content/gdrive/MyDrive/ColabNotebooks/PYNET/dataset'
-    dataset_dir = "/content/gdrive/MyDrive/ColabNotebooks/pynet_fullres/dataset"
+    dataset_dir = "C:\\PYNET\\dataset"
+    
     use_gpu = "true"
 
-    orig_model = "true"
+    orig_model = "false"
 
     for args in arguments:
-
-        if args.startswith("level"):
-            level = int(args.split("=")[1])
 
         if args.startswith("dataset_dir"):
             dataset_dir = args.split("=")[1]
@@ -92,19 +64,12 @@ def process_test_model_args(arguments):
         if args.startswith("orig"):
             orig_model = args.split("=")[1]
 
-    if restore_epoch is None and orig_model == "false":
-        restore_iter = get_last_iter(level)
-        if restore_iter == -1:
-            print("Error: Cannot find any pre-trained models for PyNET's level " + str(level) + ".")
-            sys.exit()
-
     return level, restore_epoch, dataset_dir, use_gpu, orig_model
-
 
 def get_last_iter(level):
 
     saved_models = [int((model_file.split("_")[-1]).split(".")[0])
-                    for model_file in os.listdir("/content/gdrive/MyDrive/ColabNotebooks/PYNET/models/original")
+                    for model_file in os.listdir("C:\\PYNET\\models")
                     if model_file.startswith("pynet_level_" + str(level))]
 
     if len(saved_models) > 0:
