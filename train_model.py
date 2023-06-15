@@ -1,4 +1,4 @@
-# Copyright 2020 by Andrey Ignatov. All Rights Reserved.
+# Copyright 2023 by Koray ERBAS. All Rights Reserved.
 
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -31,12 +31,12 @@ if level == 3:
     dslr_scale = 1/4
 elif level == 2:
     dslr_scale = 1/2
-elif level == 1 :
+elif level == 1:
     dslr_scale = 1
 else:
     print("undefined level !!!")
 
-#print('dslr scale: ',dslr_scale)
+print('dslr scale: ',dslr_scale)
 # Dataset size
 
 TRAIN_SIZE = 12600
@@ -92,15 +92,15 @@ def train_model():
 
             optimizer.zero_grad()
             x, y = next(train_iter)
-            #print('x shape: ',x.shape)
+            
             x = x.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
-
+            print('x shape: ',x.shape);print('y shape: ',y.shape)
             enhanced = generator(x)
 
             # MSE Loss
-            #print('enhanced shape: ',enhanced.shape)
-            #print('y shape: ',y.shape)
+            print('enhanced shape: ',enhanced.shape)
+            print('y shape: ',y.shape)
             loss_mse = MSE_loss(enhanced, y)
 
              # VGG Loss
