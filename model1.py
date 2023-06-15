@@ -49,12 +49,13 @@ class model1(nn.Module):
         self.IEM2 = IEM_module(in_channels=16)
         self.IEM3 = IEM_module(in_channels=16)
         self.IEM4 = IEM_module(in_channels=16)
-        self.conv2_l1 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True) 
-        self.conv3_l1 = ConvLayer(128, 64, kernel_size = 1, stride = 1, relu=True)
+        self.conv2_l1 = ConvLayer(64, 256, kernel_size = 3, stride = 1, relu=True) 
+        self.conv3_l1 = ConvLayer(256, 256, kernel_size = 1, stride = 1, relu=True)
+        self.pix_shuff2 = nn.PixelShuffle(2)
         self.out_att1 = att_module(input_channels=32, ratio=2, kernel_size=3)
         self.conv4_l1 = ConvLayer(32, 96, kernel_size = 3, stride = 1, relu=True)
         self.conv5_l1 = ConvLayer(96, 256, kernel_size = 3, stride = 1, relu=True) 
-        self.pix_shuff = nn.PixelShuffle(2)
+        self.pix_shuff1 = nn.PixelShuffle(2)
         self.conv6_l1 = ConvLayer(64, 3, 3, stride=1,relu = False)
         self.act1 = nn.Tanh()
         
@@ -135,8 +136,9 @@ class model1(nn.Module):
         z1_l1 = self.conv2_l1(IEM_concat)
         print('z1_l1 shape: ',z1_l1.shape)
         z2_l1=self.conv3_l1(z1_l1)
-        print('z1_l1 shape: ',z2_l1.shape) 
-        
+        print('z2_l1 shape: ',z2_l1.shape) 
+        pixel_shuffle_2 = self.pix_shuff2(z2_l1)
+
         att1 = self.out_att1(l2_upsample)
         print('att1 shape: ',att1.shape)
         z3_l1 = att1 + l2_upsample
@@ -145,13 +147,13 @@ class model1(nn.Module):
         print('z4_l1 shape: ',z4_l1.shape)
         z5_l1 = self.conv5_l1(z4_l1)
         print('z5_l1 shape: ',z5_l1.shape)
-        pixel_shuffle = self.pix_shuff(z5_l1)
-        print('pixel_shuffle shape: ',pixel_shuffle.shape) ### 16
+        pixel_shuffle_1 = self.pix_shuff1(z5_l1)
+        print('pixel_shuffle shape: ',pixel_shuffle_1.shape) ### 16
         
-        z5_l1 = z2_l1 * pixel_shuffle
-        print('z5_l1 shape: ',z5_l1.shape)
+        z6_l1 = pixel_shuffle_2 * pixel_shuffle_1
+        print('z6_l1 shape: ',z6_l1.shape)
 
-        out = self.act1(self.conv6_l1(z5_l1))
+        out = self.act1(self.conv6_l1(z6_l1))
         print('out shape: ',out.shape)
         return out
               
