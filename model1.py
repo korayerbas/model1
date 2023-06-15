@@ -10,7 +10,8 @@ class model1(nn.Module):
         super(model1, self).__init__()
         self.level = level
         
-        self.conv1_l1 = ConvMultiBlock(4, 16, 3, instance_norm=False)
+        #self.conv1_l1 = ConvMultiBlock(4, 16, 3, instance_norm=False)
+        self.conv1_l1 = ConvLayer(4, 16, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
         self.conv1_l2 = ConvLayer(16, 32, kernel_size = 3, stride = 2, relu=True, instance_norm =True)
         self.conv1_l3 = ConvLayer(32, 64, kernel_size = 3, stride = 2, relu=True, instance_norm =True)
         
@@ -40,20 +41,21 @@ class model1(nn.Module):
         self.act2 = nn.Tanh()
         ################# level-1 #######################
         
-        self.conv1= ConvLayer(4, 16, kernel_size = 5, stride = 1, relu=True, instance_norm =True)
-        self.conv2= ConvLayer(4, 16, kernel_size = 7, stride = 1, relu=True, instance_norm =True)
-        self.conv3= ConvLayer(4, 16, kernel_size = 9, stride = 1, relu=True, instance_norm =True)
+        self.conv_IEM_start = ConvLayer(32, 4, kernel_size = 1, stride = 1, relu=True)
+        self.conv1_IEM= ConvLayer(4, 16, kernel_size = 5, stride = 1, relu=True)
+        self.conv2_IEM= ConvLayer(4, 16, kernel_size = 7, stride = 1, relu=True)
+        self.conv3_IEM= ConvLayer(4, 16, kernel_size = 9, stride = 1, relu=True)
         self.IEM1 = IEM_module(in_channels=16)
         self.IEM2 = IEM_module(in_channels=16)
         self.IEM3 = IEM_module(in_channels=16)
         self.IEM4 = IEM_module(in_channels=16)
-        self.conv2_l1 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True, instance_norm =True) 
-        self.conv3_l1 = ConvLayer(128, 64, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
+        self.conv2_l1 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True) 
+        self.conv3_l1 = ConvLayer(128, 64, kernel_size = 1, stride = 1, relu=True)
         self.out_att1 = att_module(input_channels=32, ratio=2, kernel_size=3)
-        self.conv4_l1 = ConvLayer(32, 96, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
-        self.conv5_l1 = ConvLayer(96, 256, kernel_size = 3, stride = 1, relu=True, instance_norm =True) 
+        self.conv4_l1 = ConvLayer(32, 96, kernel_size = 3, stride = 1, relu=True)
+        self.conv5_l1 = ConvLayer(96, 256, kernel_size = 3, stride = 1, relu=True) 
         self.pix_shuff = nn.PixelShuffle(2)
-        self.conv6_l1 = ConvLayer(64, 3, 3, stride=1, instance_norm=True,relu = False)
+        self.conv6_l1 = ConvLayer(64, 3, 3, stride=1,relu = False)
         self.act1 = nn.Tanh()
         
     def level_3(self, conv1_l3):
@@ -110,57 +112,61 @@ class model1(nn.Module):
         #print('l2_out shape: ',l2_out.shape)
         return l2_out, l2_upsample
     
-    def level_1(self, conv1_l1, l2_upsample, x):
+    def level_1(self, conv1_l1_, l2_upsample):
         
-        a1 = self.conv1(x)
-        #print('conv1 shape: ',a1.shape)
+        print('conv1_l1 shape: ', conv1_l1_.shape)
+        print('l2_upsample',l2_upsample.shape)
+        IEM_start = self.conv_IEM_start(l2_upsample)
+        print('l2_upsample',l2_upsample.shape)
+        a1 = self.conv1_IEM(IEM_start)
+        print('conv1 shape: ',a1.shape)
         IEM_a1 = self.IEM1(a1)
-        #print('IEM1 shape: ',IEM_a1.shape)
-        a2 = self.conv2(x)
-        #print('conv2 shape: ',a2.shape)
+        print('IEM1 shape: ',IEM_a1.shape)
+        a2 = self.conv2_IEM(IEM_start)
+        print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
-        #print('IEM2 shape: ',IEM_a2.shape)
-        a3 = self.conv3(x)
-        #print('conv3 shape: ',a3.shape)
+        print('IEM2 shape: ',IEM_a2.shape)
+        a3 = self.conv3_IEM(IEM_start)
+        print('conv3 shape: ',a3.shape)
         IEM_a3 = self.IEM3(a3)
-        #print('IEM3 shape: ',IEM_a3.shape)
-        IEM_concat = torch.cat([conv1_l1, IEM_a1, IEM_a2, IEM_a3], dim=1)
-        #print('IEM_concat shape: ',IEM_concat.shape)
+        print('IEM3 shape: ',IEM_a3.shape)
+        IEM_concat = torch.cat([conv1_l1_, IEM_a1, IEM_a2, IEM_a3], dim=1)
+        print('IEM_concat shape: ',IEM_concat.shape)
         z1_l1 = self.conv2_l1(IEM_concat)
-        #print('z1_l1 shape: ',z1_l1.shape)
+        print('z1_l1 shape: ',z1_l1.shape)
         z2_l1=self.conv3_l1(z1_l1)
-        #print('z1_l1 shape: ',z2_l1.shape) 
+        print('z1_l1 shape: ',z2_l1.shape) 
         
         att1 = self.out_att1(l2_upsample)
-        #print('att1 shape: ',att1.shape)
+        print('att1 shape: ',att1.shape)
         z3_l1 = att1 + l2_upsample
-        #print('z3_l1 shape: ',z3_l1.shape)
+        print('z3_l1 shape: ',z3_l1.shape)
         z4_l1 = self.conv4_l1(z3_l1)
-        #print('z4_l1 shape: ',z4_l1.shape)
+        print('z4_l1 shape: ',z4_l1.shape)
         z5_l1 = self.conv5_l1(z4_l1)
-        #print('z5_l1 shape: ',z5_l1.shape)
+        print('z5_l1 shape: ',z5_l1.shape)
         pixel_shuffle = self.pix_shuff(z5_l1)
-        #print('pixel_shuffle shape: ',pixel_shuffle.shape) ### 16
+        print('pixel_shuffle shape: ',pixel_shuffle.shape) ### 16
         
         z5_l1 = z2_l1 * pixel_shuffle
-        #print('z5_l1 shape: ',z5_l1.shape)
+        print('z5_l1 shape: ',z5_l1.shape)
 
         out = self.act1(self.conv6_l1(z5_l1))
-        #print('out shape: ',out.shape)
+        print('out shape: ',out.shape)
         return out
               
     def forward(self, x):
         
-       conv1_l1 = self.conv1_l1(x)     
-       conv2_l1 = self.conv1_l2(conv1_l1)
-       conv1_l3 = self.conv1_l3(conv2_l1)
+       conv1_l1_ = self.conv1_l1(x)     
+       conv1_l2_ = self.conv1_l2(conv1_l1_)
+       conv1_l3_ = self.conv1_l3(conv1_l2_)
        
-       l3_out, l3_upsample =self.level_3(conv1_l3)
+       l3_out, l3_upsample =self.level_3(conv1_l3_)
 
        if self.level < 3:
-           l2_out, l2_upsample = self.level_2(conv2_l1, l3_upsample)
+           l2_out, l2_upsample = self.level_2(conv1_l2_, l3_upsample)
        if self.level < 2:
-           out = self.level_1(x, conv1_l1, l2_upsample)
+           out = self.level_1(conv1_l1_, l2_upsample)
        
        if self.level == 1:
            enhanced = out
@@ -348,33 +354,33 @@ class IEM_module(nn.Module):
     def __init__(self, in_channels):
     
         super(IEM_module, self).__init__()
-        
-        reflection_padding = 3//2
-        self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
-        self.conv1 = ConvLayer(in_channels, 16, 3, 1, relu=True, instance_norm=True)
+        #print('in channels : ', in_channels)
+        #reflection_padding = 3//2
+        #self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
+        self.conv1 = ConvLayer(in_channels, 16, 3, 1, relu=True)
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         
-        self.conv2 = ConvLayer(in_channels, 8, 1, 1, relu= True, instance_norm=True)
-        self.conv3 = ConvLayer(8, 8, 1, 1, relu= True, instance_norm=True)
-        self.conv4 = ConvLayer(8, 16, 1, 1, relu= True, instance_norm=True)
+        self.conv2 = ConvLayer(in_channels, 8, 1, 1, relu= True)
+        self.conv3 = ConvLayer(8, 8, 1, 1, relu= True)
+        self.conv4 = ConvLayer(8, 16, 1, 1, relu= True)
         
     def forward(self, x):
-       #print('x_att shape: ',x.shape)
-       ref_pad = self.reflection_pad(x)
+       print('x_att shape: ',x.shape)
+       #ref_pad = self.reflection_pad(x)
        #print('ref_pad_att shape: ',ref_pad.shape)
-       z1 = self.conv1(ref_pad)
-       #print('z1 shape: ',z1.shape)
+       z1 = self.conv1(x)
+       print('z1 shape: ',z1.shape)
        
        avg_pool_out = self.avg_pool(x)
-       #print('avg_pool shape: ',avg_pool_out.shape)
+       print('avg_pool shape: ',avg_pool_out.shape)
        z2 = self.conv2(avg_pool_out)
-       #print('conv2 shape: ',z1.shape)
+       print('conv2 shape: ',z1.shape)
        z3 = self.conv3(z2)
-       #print('conv3 shape: ',z3.shape)
+       print('conv3 shape: ',z3.shape)
        z4 = self.conv4(z3)
-       #print('conv4 shape: ',z3.shape) 
+       print('conv4 shape: ',z3.shape) 
        
        out = z1 * z4 * x
-       #print('out shape: ',out1.shape)
+       print('out shape: ',out.shape)
        
        return out
