@@ -40,20 +40,20 @@ class model1(nn.Module):
         self.act2 = nn.Tanh()
         ################# level-1 #######################
         
-        self.conv1= ConvLayer(16, 32, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
-        self.conv2= ConvLayer(16, 32, kernel_size = 5, stride = 1, relu=True, instance_norm =True)
-        self.conv3= ConvLayer(16, 32, kernel_size = 7, stride = 1, relu=True, instance_norm =True)
-        self.conv4= ConvLayer(16, 32, kernel_size = 9, stride = 1, relu=True, instance_norm =True)
-        self.IEM1 = IEM_module(in_channels=32)
-        self.IEM2 = IEM_module(in_channels=32)
-        self.IEM3 = IEM_module(in_channels=32)
-        self.IEM4 = IEM_module(in_channels=32)
-        self.conv2_l1 = ConvLayer(128, 256, kernel_size = 3, stride = 1, relu=True, instance_norm =True) 
-        self.conv3_l1 = ConvLayer(256, 64, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
+        self.conv1= ConvLayer(4, 16, kernel_size = 5, stride = 1, relu=True, instance_norm =True)
+        self.conv2= ConvLayer(4, 16, kernel_size = 7, stride = 1, relu=True, instance_norm =True)
+        self.conv3= ConvLayer(4, 16, kernel_size = 9, stride = 1, relu=True, instance_norm =True)
+        self.IEM1 = IEM_module(in_channels=16)
+        self.IEM2 = IEM_module(in_channels=16)
+        self.IEM3 = IEM_module(in_channels=16)
+        self.IEM4 = IEM_module(in_channels=16)
+        self.conv2_l1 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True, instance_norm =True) 
+        self.conv3_l1 = ConvLayer(128, 64, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
         self.out_att1 = att_module(input_channels=32, ratio=2, kernel_size=3)
-        self.conv4_l1 = ConvMultiBlock(32, 256, 3, instance_norm=True)  
+        self.conv4_l1 = ConvLayer(32, 96, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
+        self.conv5_l1 = ConvLayer(96, 256, kernel_size = 3, stride = 1, relu=True, instance_norm =True) 
         self.pix_shuff = nn.PixelShuffle(2)
-        self.conv5_l1 = ConvLayer(64, 3, 3, stride=1, instance_norm=True,relu = False)
+        self.conv6_l1 = ConvLayer(64, 3, 3, stride=1, instance_norm=True,relu = False)
         self.act1 = nn.Tanh()
         
     def level_3(self, conv1_l3):
@@ -110,25 +110,21 @@ class model1(nn.Module):
         #print('l2_out shape: ',l2_out.shape)
         return l2_out, l2_upsample
     
-    def level_1(self, conv1_l1, l2_upsample):
+    def level_1(self, conv1_l1, l2_upsample, x):
         
-        a1 = self.conv1(conv1_l1)
-        #print('conv1 shape: ',conv1_l1.shape)
+        a1 = self.conv1(x)
+        #print('conv1 shape: ',a1.shape)
         IEM_a1 = self.IEM1(a1)
         #print('IEM1 shape: ',IEM_a1.shape)
-        a2 = self.conv2(conv1_l1)
-        #print('conv1 shape: ',a2.shape)
+        a2 = self.conv2(x)
+        #print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
         #print('IEM2 shape: ',IEM_a2.shape)
-        a3 = self.conv3(conv1_l1)
-        #print('conv1 shape: ',a3.shape)
+        a3 = self.conv3(x)
+        #print('conv3 shape: ',a3.shape)
         IEM_a3 = self.IEM3(a3)
         #print('IEM3 shape: ',IEM_a3.shape)
-        a4 = self.conv4(conv1_l1)
-        #print('conv1 shape: ',a4.shape)
-        IEM_a4 = self.IEM4(a4)
-        #print('IEM4 shape: ',IEM_a4.shape)
-        IEM_concat = torch.cat([IEM_a1, IEM_a2, IEM_a3, IEM_a4], dim=1)
+        IEM_concat = torch.cat([conv1_l1, IEM_a1, IEM_a2, IEM_a3], dim=1)
         #print('IEM_concat shape: ',IEM_concat.shape)
         z1_l1 = self.conv2_l1(IEM_concat)
         #print('z1_l1 shape: ',z1_l1.shape)
@@ -141,16 +137,15 @@ class model1(nn.Module):
         #print('z3_l1 shape: ',z3_l1.shape)
         z4_l1 = self.conv4_l1(z3_l1)
         #print('z4_l1 shape: ',z4_l1.shape)
-        pixel_shuffle = self.pix_shuff(z4_l1)
+        z5_l1 = self.conv5_l1(z4_l1)
+        #print('z5_l1 shape: ',z5_l1.shape)
+        pixel_shuffle = self.pix_shuff(z5_l1)
         #print('pixel_shuffle shape: ',pixel_shuffle.shape) ### 16
         
         z5_l1 = z2_l1 * pixel_shuffle
         #print('z5_l1 shape: ',z5_l1.shape)
-        out = self.act1(self.conv5_l1(z5_l1)) 
-        
-        t2 = conv1_l1 + pixel_shuffle
-        #print('t2 shape: ',t2.shape)
-        out = self.act1(self.conv4_l1(t2))
+
+        out = self.act1(self.conv6_l1(z5_l1))
         #print('out shape: ',out.shape)
         return out
               
@@ -273,7 +268,6 @@ class SpatialAttention(nn.Module):
         #print('out_sa shape: ',out.shape)
         return out
 
-
 class ChannelAttention(nn.Module):
     def __init__(self, in_channels, ratio):
         super(ChannelAttention, self).__init__()
@@ -357,38 +351,30 @@ class IEM_module(nn.Module):
         
         reflection_padding = 3//2
         self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
-        self.conv1 = nn.Conv2d(in_channels, in_channels, kernel_size=3, bias=False)
-        self.act1 = nn.Sigmoid()
+        self.conv1 = ConvLayer(in_channels, 16, 3, 1, relu=True, instance_norm=True)
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         
-        self.fc1 = nn.Linear(in_channels, 16)
-        self.act2 = nn.ReLU()
-        #self.conv2 = nn.Conv2d(in_channels, in_channels/4, kernel_size=1, bias=False)
-        self.fc2 = nn.Linear(16, 8)
-        self.act3 = nn.ReLU()
-        self.fc3 = nn.Linear (8, 16)
-        self.act4 = nn.Sigmoid()
+        self.conv2 = ConvLayer(in_channels, 16, 1, 1, relu= True, instance_norm=True)
+        self.conv3 = ConvLayer(16, 8, 1, 1, relu= True, instance_norm=True)
+        self.conv4 = ConvLayer(8, 16, 1, 1, relu= True, instance_norm=True)
         
     def forward(self, x):
        #print('x_att shape: ',x.shape)
        ref_pad = self.reflection_pad(x)
        #print('ref_pad_att shape: ',ref_pad.shape)
-       conv1 = self.act1(self.conv1(ref_pad))
-       #print('conv1 shape: ',conv1.shape)
-       
+       z1 = self.conv1(ref_pad)
+       #print('z1 shape: ',z1.shape)
        
        avg_pool_out = self.avg_pool(x)
        #print('avg_pool shape: ',avg_pool_out.shape)
-       z1 = self.act2(self.fc1(avg_pool_out))
-       #print('fc1 shape: ',z1.shape)
-       z2 = self.act3(self.fc2(z1))
-       #print('fc2 shape: ',z2.shape)
-       z3 = self.act4(self.fc3(z2))
-       #print('fc3 shape: ',z3.shape)
+       z2 = self.conv2(avg_pool_out)
+       #print('conv2 shape: ',z1.shape)
+       z3 = self.conv3(z2)
+       #print('conv3 shape: ',z3.shape)
+       z4 = self.conv4(z3)
+       #print('conv4 shape: ',z3.shape) 
        
-       out1 = conv1 * z3
-       #print('out1 shape: ',out1.shape)
+       out = z1 * z4 * x
+       #print('out shape: ',out1.shape)
        
-       out = x * out1
-       #print('out shape: ',out.shape)
        return out
