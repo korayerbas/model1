@@ -228,8 +228,8 @@ class depthwise_conv(nn.Module):
     def __init__(self, in_channels, kernel_size):
         super(depthwise_conv, self).__init__()
         
-        print('kernel_size: ',kernel_size)
-        #reflection_padding = 2*(kernel_size//2)
+        #print('kernel_size: ',kernel_size)
+        reflection_padding = 2*(kernel_size//2)
         
         self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
         self.dw_conv =  nn.Sequential(nn.Conv2d(in_channels, in_channels, kernel_size, dilation=2, groups=in_channels),nn.ReLU())
