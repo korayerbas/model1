@@ -354,8 +354,8 @@ class IEM_module(nn.Module):
         self.conv1 = ConvLayer(in_channels, 16, 3, 1, relu=True, instance_norm=True)
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         
-        self.conv2 = ConvLayer(in_channels, 16, 1, 1, relu= True, instance_norm=True)
-        self.conv3 = ConvLayer(16, 8, 1, 1, relu= True, instance_norm=True)
+        self.conv2 = ConvLayer(in_channels, 8, 1, 1, relu= True, instance_norm=True)
+        self.conv3 = ConvLayer(8, 8, 1, 1, relu= True, instance_norm=True)
         self.conv4 = ConvLayer(8, 16, 1, 1, relu= True, instance_norm=True)
         
     def forward(self, x):
