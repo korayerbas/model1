@@ -367,11 +367,11 @@ class IEM_module(nn.Module):
         self.conv4 = ConvLayer(8, 16, 1, 1, relu= True)
         
     def forward(self, x):
-       print('x_att shape: ',x.shape)
+       #print('x_att shape: ',x.shape)
        #ref_pad = self.reflection_pad(x)
        #print('ref_pad_att shape: ',ref_pad.shape)
        z1 = self.conv1(x)
-       print('z1 shape: ',z1.shape)
+       #print('z1 shape: ',z1.shape)
        
        avg_pool_out = self.avg_pool(x)
        #print('avg_pool shape: ',avg_pool_out.shape)
