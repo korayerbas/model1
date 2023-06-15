@@ -60,7 +60,7 @@ def train_model():
     test_loader = DataLoader(dataset=test_dataset, batch_size=1, shuffle=False, num_workers=1,
                              pin_memory=True, drop_last=False)
 
-    visual_dataset = LoadVisualData(dataset_dir, 3, dslr_scale)
+    visual_dataset = LoadVisualData(dataset_dir, 3, dslr_scale, level)
     visual_loader = DataLoader(dataset=visual_dataset, batch_size=1, shuffle=False, num_workers=0,
                                pin_memory=True, drop_last=False)
 
