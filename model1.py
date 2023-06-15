@@ -115,46 +115,46 @@ class model1(nn.Module):
     
     def level_1(self, conv1_l1_, l2_upsample):
         
-        print('conv1_l1 shape: ', conv1_l1_.shape)
-        print('l2_upsample',l2_upsample.shape)
+        #print('conv1_l1 shape: ', conv1_l1_.shape)
+        #print('l2_upsample',l2_upsample.shape)
         IEM_start = self.conv_IEM_start(l2_upsample)
-        print('l2_upsample',l2_upsample.shape)
+        #print('l2_upsample',l2_upsample.shape)
         a1 = self.conv1_IEM(IEM_start)
-        print('conv1 shape: ',a1.shape)
+        #print('conv1 shape: ',a1.shape)
         IEM_a1 = self.IEM1(a1)
-        print('IEM1 shape: ',IEM_a1.shape)
+        #print('IEM1 shape: ',IEM_a1.shape)
         a2 = self.conv2_IEM(IEM_start)
-        print('conv2 shape: ',a2.shape)
+        #print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
-        print('IEM2 shape: ',IEM_a2.shape)
+        #print('IEM2 shape: ',IEM_a2.shape)
         a3 = self.conv3_IEM(IEM_start)
-        print('conv3 shape: ',a3.shape)
+        #print('conv3 shape: ',a3.shape)
         IEM_a3 = self.IEM3(a3)
-        print('IEM3 shape: ',IEM_a3.shape)
+        #print('IEM3 shape: ',IEM_a3.shape)
         IEM_concat = torch.cat([conv1_l1_, IEM_a1, IEM_a2, IEM_a3], dim=1)
-        print('IEM_concat shape: ',IEM_concat.shape)
+        #print('IEM_concat shape: ',IEM_concat.shape)
         z1_l1 = self.conv2_l1(IEM_concat)
-        print('z1_l1 shape: ',z1_l1.shape)
+        #print('z1_l1 shape: ',z1_l1.shape)
         z2_l1=self.conv3_l1(z1_l1)
-        print('z2_l1 shape: ',z2_l1.shape) 
+        #print('z2_l1 shape: ',z2_l1.shape) 
         pixel_shuffle_2 = self.pix_shuff2(z2_l1)
 
         att1 = self.out_att1(l2_upsample)
-        print('att1 shape: ',att1.shape)
+        #print('att1 shape: ',att1.shape)
         z3_l1 = att1 + l2_upsample
-        print('z3_l1 shape: ',z3_l1.shape)
+        #print('z3_l1 shape: ',z3_l1.shape)
         z4_l1 = self.conv4_l1(z3_l1)
-        print('z4_l1 shape: ',z4_l1.shape)
+        #print('z4_l1 shape: ',z4_l1.shape)
         z5_l1 = self.conv5_l1(z4_l1)
-        print('z5_l1 shape: ',z5_l1.shape)
+        #print('z5_l1 shape: ',z5_l1.shape)
         pixel_shuffle_1 = self.pix_shuff1(z5_l1)
-        print('pixel_shuffle shape: ',pixel_shuffle_1.shape) ### 16
+        #print('pixel_shuffle shape: ',pixel_shuffle_1.shape) ### 16
         
         z6_l1 = pixel_shuffle_2 * pixel_shuffle_1
-        print('z6_l1 shape: ',z6_l1.shape)
+        #print('z6_l1 shape: ',z6_l1.shape)
 
         out = self.act1(self.conv6_l1(z6_l1))
-        print('out shape: ',out.shape)
+        #print('out shape: ',out.shape)
         return out
               
     def forward(self, x):
@@ -374,15 +374,15 @@ class IEM_module(nn.Module):
        print('z1 shape: ',z1.shape)
        
        avg_pool_out = self.avg_pool(x)
-       print('avg_pool shape: ',avg_pool_out.shape)
+       #print('avg_pool shape: ',avg_pool_out.shape)
        z2 = self.conv2(avg_pool_out)
-       print('conv2 shape: ',z1.shape)
+       #print('conv2 shape: ',z1.shape)
        z3 = self.conv3(z2)
-       print('conv3 shape: ',z3.shape)
+       #print('conv3 shape: ',z3.shape)
        z4 = self.conv4(z3)
-       print('conv4 shape: ',z3.shape) 
+       #print('conv4 shape: ',z3.shape) 
        
        out = z1 * z4 * x
-       print('out shape: ',out.shape)
+       #print('out shape: ',out.shape)
        
        return out
