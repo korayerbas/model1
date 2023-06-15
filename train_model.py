@@ -31,7 +31,7 @@ if level == 3:
     dslr_scale = 1/4
 elif level == 2:
     dslr_scale = 1/2
-elif level == 3 :
+elif level == 1 :
     dslr_scale = 1
 else:
     print("undefined level !!!")
