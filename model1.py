@@ -160,7 +160,7 @@ class model1(nn.Module):
        if self.level < 3:
            l2_out, l2_upsample = self.level_2(conv2_l1, l3_upsample)
        if self.level < 2:
-           out = self.level_1(conv1_l1, l2_upsample)
+           out = self.level_1(x, conv1_l1, l2_upsample)
        
        if self.level == 1:
            enhanced = out
