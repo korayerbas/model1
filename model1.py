@@ -1,5 +1,3 @@
-# Copyright 2023 by Koray Erbas. All Rights Reserved.
-
 import torch.nn as nn
 import torch
 
@@ -41,16 +39,16 @@ class model1(nn.Module):
         self.act2 = nn.Tanh()
         ################# level-1 #######################
         
-        self.conv1_IEM= ConvLayer(4, 16, kernel_size = 5, stride = 1, relu=True)
+        #self.conv1_IEM= ConvLayer(4, 16, kernel_size = 5, stride = 1, relu=True)
         self.conv2_IEM= ConvLayer(4, 16, kernel_size = 7, stride = 1, relu=True)
-        self.conv3_IEM= ConvLayer(4, 16, kernel_size = 9, stride = 1, relu=True)
-        self.IEM1 = IEM_module(in_channels=16)
+        #self.conv3_IEM= ConvLayer(4, 16, kernel_size = 9, stride = 1, relu=True)
+        #self.IEM1 = IEM_module(in_channels=16)
         self.IEM2 = IEM_module(in_channels=16)
-        self.IEM3 = IEM_module(in_channels=16)
+        #self.IEM3 = IEM_module(in_channels=16)
         self.IEM4 = IEM_module(in_channels=16); #for conv1_l1 
         self.out_att1 = att_module(input_channels=32, ratio =2, kernel_size_sa=3, dilation_sa=1)#l2_upsample
-        self.conv2_l1 = ConvLayer(32, 64, kernel_size = 3, stride = 1, relu=True) 
-        self.conv3_l1 = depthwise_conv(128, 256, 3, dilation_dw=1)        
+        #self.conv2_l1 = ConvLayer(32, 64, kernel_size = 3, stride = 1, relu=True) 
+        self.conv3_l1 = depthwise_conv(64, 256, 3, dilation_dw=1)        
         self.pix_shuff = nn.PixelShuffle(2)
         self.conv4_l1 = ConvLayer(64, 3, 3, stride=1,relu = False)
         self.act1 = nn.Tanh()
@@ -114,18 +112,18 @@ class model1(nn.Module):
         print('conv1_l1 shape: ', conv1_l1_.shape)
         print('l2_upsample',l2_upsample.shape)
         print('x shape',x.shape)
-        a1 = self.conv1_IEM(x)
-        print('conv1 shape: ',a1.shape)
-        IEM_a1 = self.IEM1(a1)
-        print('IEM1 shape: ',IEM_a1.shape)
+        #a1 = self.conv1_IEM(x)
+        #print('conv1 shape: ',a1.shape)
+        #IEM_a1 = self.IEM1(a1)
+        #print('IEM1 shape: ',IEM_a1.shape)
         a2 = self.conv2_IEM(x)
         print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
         print('IEM2 shape: ',IEM_a2.shape)
-        a3 = self.conv3_IEM(x)
-        print('conv3 shape: ',a3.shape)
-        IEM_a3 = self.IEM3(a3)
-        print('IEM3 shape: ',IEM_a3.shape)
+        #a3 = self.conv3_IEM(x)
+        #print('conv3 shape: ',a3.shape)
+        #IEM_a3 = self.IEM3(a3)
+        #print('IEM3 shape: ',IEM_a3.shape)
         IEM_a4 = self.IEM4(conv1_l1_)
         print('IEM4 shape: ',IEM_a4.shape)
         
@@ -133,10 +131,10 @@ class model1(nn.Module):
         print('att1 shape: ',att1.shape)
         z1 = att1 + l2_upsample
         print('z1 shape: ',z1.shape)
-        z2 = self.conv2_l1(z1)
-        print('z2 shape: ',z2.shape)
+        #z2 = self.conv2_l1(z1)
+        #print('z2 shape: ',z2.shape)
         
-        IEM_concat = torch.cat([z2, IEM_a1, IEM_a2, IEM_a3, IEM_a4], dim=1)
+        IEM_concat = torch.cat([z1, IEM_a2, IEM_a4], dim=1)
         print('IEM_concat shape: ',IEM_concat.shape)
         z3 = self.conv3_l1(IEM_concat)
         print('z3 shape: ',z3.shape)
