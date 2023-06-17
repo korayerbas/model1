@@ -17,11 +17,11 @@ class model1(nn.Module):
         
         ########################  level-3    #####################
        
-        self.conv2_l3 = depthwise_conv(64,3) 
+        self.conv2_l3 = depthwise_conv(64, 64, 3) 
         self.cam1 = ChannelAttention(in_channels=64, ratio=1)
         self.sam1 = SpatialAttention(64, 64,kernel_size = 3, stride = 1,dilation = 1)
         self.conv3_l3 = ConvLayer(64, 32, kernel_size = 5, stride = 1, relu=True, instance_norm =True)
-        self.conv4_l3 = depthwise_conv(32,5)  
+        self.conv4_l3 = depthwise_conv(32,32,5)  
         self.conv5_l3 = ConvLayer(32, 64, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
         self.conv6_l3 = ConvLayer(64, 32, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
         self.upsample3 = UpsampleConvLayer(64, 32, 3) 
@@ -31,7 +31,7 @@ class model1(nn.Module):
         ####################### level-2 ########################3 
        
         self.conv2_l2 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
-        self.conv3_l2 = depthwise_conv(64,3)
+        self.conv3_l2 = depthwise_conv(64, 64, 3)
         self.conv4_l2 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True, instance_norm =True)        
         self.conv5_l2 = ConvLayer(256, 64, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
         self.cam2 = ChannelAttention(in_channels=64, ratio=1)
@@ -41,22 +41,18 @@ class model1(nn.Module):
         self.act2 = nn.Tanh()
         ################# level-1 #######################
         
-        self.conv_IEM_start = ConvLayer(32, 4, kernel_size = 1, stride = 1, relu=True)
         self.conv1_IEM= ConvLayer(4, 16, kernel_size = 5, stride = 1, relu=True)
         self.conv2_IEM= ConvLayer(4, 16, kernel_size = 7, stride = 1, relu=True)
         self.conv3_IEM= ConvLayer(4, 16, kernel_size = 9, stride = 1, relu=True)
         self.IEM1 = IEM_module(in_channels=16)
         self.IEM2 = IEM_module(in_channels=16)
         self.IEM3 = IEM_module(in_channels=16)
-        self.IEM4 = IEM_module(in_channels=16)
-        self.conv2_l1 = ConvLayer(64, 256, kernel_size = 3, stride = 1, relu=True) 
-        self.conv3_l1 = ConvLayer(256, 256, kernel_size = 1, stride = 1, relu=True)
-        self.pix_shuff2 = nn.PixelShuffle(2)
-        self.out_att1 = att_module(input_channels=32, ratio=2, kernel_size=3)
-        self.conv4_l1 = ConvLayer(32, 96, kernel_size = 3, stride = 1, relu=True)
-        self.conv5_l1 = ConvLayer(96, 256, kernel_size = 3, stride = 1, relu=True) 
-        self.pix_shuff1 = nn.PixelShuffle(2)
-        self.conv6_l1 = ConvLayer(64, 3, 3, stride=1,relu = False)
+        self.IEM4 = IEM_module(in_channels=16); #for conv1_l1 
+        self.out_att1 = att_module(input_channels=32, ratio =2, kernel_size_sa=3, dilation_sa=1)#l2_upsample
+        self.conv2_l1 = ConvLayer(32, 64, kernel_size = 3, stride = 1, relu=True) 
+        self.conv3_l1 = depthwise_conv(128, 256, 3)        
+        self.pix_shuff = nn.PixelShuffle(2)
+        self.conv4_l1 = ConvLayer(64, 3, 3, stride=1,relu = False)
         self.act1 = nn.Tanh()
         
     def level_3(self, conv1_l3):
@@ -113,47 +109,42 @@ class model1(nn.Module):
         #print('l2_out shape: ',l2_out.shape)
         return l2_out, l2_upsample
     
-    def level_1(self, conv1_l1_, l2_upsample):
+    def level_1(self, conv1_l1_, l2_upsample, x):
         
         #print('conv1_l1 shape: ', conv1_l1_.shape)
         #print('l2_upsample',l2_upsample.shape)
-        IEM_start = self.conv_IEM_start(l2_upsample)
-        #print('l2_upsample',l2_upsample.shape)
-        a1 = self.conv1_IEM(IEM_start)
+        #print('x shape',x.shape)
+        a1 = self.conv1_IEM(x)
         #print('conv1 shape: ',a1.shape)
         IEM_a1 = self.IEM1(a1)
         #print('IEM1 shape: ',IEM_a1.shape)
-        a2 = self.conv2_IEM(IEM_start)
+        a2 = self.conv2_IEM(x)
         #print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
         #print('IEM2 shape: ',IEM_a2.shape)
-        a3 = self.conv3_IEM(IEM_start)
+        a3 = self.conv3_IEM(x)
         #print('conv3 shape: ',a3.shape)
         IEM_a3 = self.IEM3(a3)
         #print('IEM3 shape: ',IEM_a3.shape)
-        IEM_concat = torch.cat([conv1_l1_, IEM_a1, IEM_a2, IEM_a3], dim=1)
-        #print('IEM_concat shape: ',IEM_concat.shape)
-        z1_l1 = self.conv2_l1(IEM_concat)
-        #print('z1_l1 shape: ',z1_l1.shape)
-        z2_l1=self.conv3_l1(z1_l1)
-        #print('z2_l1 shape: ',z2_l1.shape) 
-        pixel_shuffle_2 = self.pix_shuff2(z2_l1)
-
+        IEM_a4 = self.IEM4(conv1_l1_)
+        #print('IEM4 shape: ',IEM_a4.shape)
+        
         att1 = self.out_att1(l2_upsample)
         #print('att1 shape: ',att1.shape)
-        z3_l1 = att1 + l2_upsample
-        #print('z3_l1 shape: ',z3_l1.shape)
-        z4_l1 = self.conv4_l1(z3_l1)
-        #print('z4_l1 shape: ',z4_l1.shape)
-        z5_l1 = self.conv5_l1(z4_l1)
-        #print('z5_l1 shape: ',z5_l1.shape)
-        pixel_shuffle_1 = self.pix_shuff1(z5_l1)
-        #print('pixel_shuffle shape: ',pixel_shuffle_1.shape) ### 16
+        z1 = att1 + l2_upsample
+        #print('z1 shape: ',z1.shape)
+        z2 = self.conv2_l1(z1)
+        #print('z2 shape: ',z2.shape)
         
-        z6_l1 = pixel_shuffle_2 * pixel_shuffle_1
-        #print('z6_l1 shape: ',z6_l1.shape)
-
-        out = self.act1(self.conv6_l1(z6_l1))
+        IEM_concat = torch.cat([z2, IEM_a1, IEM_a2, IEM_a3, IEM_a4], dim=1)
+        #print('IEM_concat shape: ',IEM_concat.shape)
+        z3 = self.conv3_l1(IEM_concat)
+        #print('z1_l1 shape: ',z1_l1.shape)
+        z4=self.conv3_l1(z3)
+        #print('z4 shape: ',z4.shape) 
+        pixel_shuffle = self.pix_shuff(z4)
+        #print('pixel shuffle_shape: ', pixel_shuffle.shape)
+        out = self.act1(self.conv4_l1(pixel_shuffle))
         #print('out shape: ',out.shape)
         return out
               
@@ -168,7 +159,7 @@ class model1(nn.Module):
        if self.level < 3:
            l2_out, l2_upsample = self.level_2(conv1_l2_, l3_upsample)
        if self.level < 2:
-           out = self.level_1(conv1_l1_, l2_upsample)
+           out = self.level_1(conv1_l1_, l2_upsample, x)
        
        if self.level == 1:
            enhanced = out
@@ -228,15 +219,15 @@ class ConvLayer(nn.Module):
         return out
     
 class depthwise_conv(nn.Module):
-    def __init__(self, in_channels, kernel_size):
+    def __init__(self, in_channels, out_channels, kernel_size):
         super(depthwise_conv, self).__init__()
         
         #print('kernel_size: ',kernel_size)
         reflection_padding = 2*(kernel_size//2)
         
         self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
-        self.dw_conv =  nn.Sequential(nn.Conv2d(in_channels, in_channels, kernel_size, dilation=2, groups=in_channels),nn.ReLU())
-        self.point_conv = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+        self.dw_conv =  nn.Sequential(nn.Conv2d(in_channels, out_channels, kernel_size, dilation=2, groups=in_channels),nn.ReLU())
+        self.point_conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
     def forward(self, x):
         
@@ -326,7 +317,7 @@ class UpsampleConvLayer(torch.nn.Module):
 
 class att_module(nn.Module):
     
-    def __init__(self, input_channels, ratio, kernel_size, instance_norm=False):
+    def __init__(self, input_channels, ratio, kernel_size_sa, dilation_sa, instance_norm=True):
         super(att_module, self).__init__()
         
         self.conv1 = ConvLayer(in_channels= input_channels, out_channels=input_channels*2, kernel_size=3, stride=1, relu=True)
@@ -334,7 +325,7 @@ class att_module(nn.Module):
         
         self.ca = ChannelAttention(input_channels*2, ratio)
         #self.sa = SpatialAttention(in_channels, kernel_size=5, dilation=2)
-        self.sa = SpatialAttention(input_channels*2, input_channels*2, kernel_size=5, stride = 1, dilation=2)
+        self.sa = SpatialAttention(input_channels*2, input_channels*2, kernel_size = kernel_size_sa, stride = 1, dilation=dilation_sa)
         self.conv3 = ConvLayer(input_channels*4, input_channels, kernel_size=1, stride= 1, relu=True)
     
     def forward(self, x):
