@@ -1,4 +1,4 @@
-# Copyright 2020 by Andrey Ignatov. All Rights Reserved.
+# Copyright 2023 by Koray Erbas. All Rights Reserved.
 
 import torch.nn as nn
 import torch
@@ -17,11 +17,11 @@ class model1(nn.Module):
         
         ########################  level-3    #####################
        
-        self.conv2_l3 = depthwise_conv(64, 64, 3) 
+        self.conv2_l3 = depthwise_conv(64, 64, 3, dilation_dw=2) 
         self.cam1 = ChannelAttention(in_channels=64, ratio=1)
         self.sam1 = SpatialAttention(64, 64,kernel_size = 3, stride = 1,dilation = 1)
         self.conv3_l3 = ConvLayer(64, 32, kernel_size = 5, stride = 1, relu=True, instance_norm =True)
-        self.conv4_l3 = depthwise_conv(32,32,5)  
+        self.conv4_l3 = depthwise_conv(32,32,5,dilation_dw=2)  
         self.conv5_l3 = ConvLayer(32, 64, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
         self.conv6_l3 = ConvLayer(64, 32, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
         self.upsample3 = UpsampleConvLayer(64, 32, 3) 
@@ -31,7 +31,7 @@ class model1(nn.Module):
         ####################### level-2 ########################3 
        
         self.conv2_l2 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True, instance_norm =True)
-        self.conv3_l2 = depthwise_conv(64, 64, 3)
+        self.conv3_l2 = depthwise_conv(64, 64, 3, dilation_dw=1)
         self.conv4_l2 = ConvLayer(64, 128, kernel_size = 3, stride = 1, relu=True, instance_norm =True)        
         self.conv5_l2 = ConvLayer(256, 64, kernel_size = 1, stride = 1, relu=True, instance_norm =True)
         self.cam2 = ChannelAttention(in_channels=64, ratio=1)
@@ -50,7 +50,7 @@ class model1(nn.Module):
         self.IEM4 = IEM_module(in_channels=16); #for conv1_l1 
         self.out_att1 = att_module(input_channels=32, ratio =2, kernel_size_sa=3, dilation_sa=1)#l2_upsample
         self.conv2_l1 = ConvLayer(32, 64, kernel_size = 3, stride = 1, relu=True) 
-        self.conv3_l1 = depthwise_conv(128, 256, 3)        
+        self.conv3_l1 = depthwise_conv(128, 256, 3, dilation_dw=1)        
         self.pix_shuff = nn.PixelShuffle(2)
         self.conv4_l1 = ConvLayer(64, 3, 3, stride=1,relu = False)
         self.act1 = nn.Tanh()
@@ -111,38 +111,36 @@ class model1(nn.Module):
     
     def level_1(self, conv1_l1_, l2_upsample, x):
         
-        #print('conv1_l1 shape: ', conv1_l1_.shape)
-        #print('l2_upsample',l2_upsample.shape)
-        #print('x shape',x.shape)
+        print('conv1_l1 shape: ', conv1_l1_.shape)
+        print('l2_upsample',l2_upsample.shape)
+        print('x shape',x.shape)
         a1 = self.conv1_IEM(x)
-        #print('conv1 shape: ',a1.shape)
+        print('conv1 shape: ',a1.shape)
         IEM_a1 = self.IEM1(a1)
-        #print('IEM1 shape: ',IEM_a1.shape)
+        print('IEM1 shape: ',IEM_a1.shape)
         a2 = self.conv2_IEM(x)
-        #print('conv2 shape: ',a2.shape)
+        print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
-        #print('IEM2 shape: ',IEM_a2.shape)
+        print('IEM2 shape: ',IEM_a2.shape)
         a3 = self.conv3_IEM(x)
-        #print('conv3 shape: ',a3.shape)
+        print('conv3 shape: ',a3.shape)
         IEM_a3 = self.IEM3(a3)
-        #print('IEM3 shape: ',IEM_a3.shape)
+        print('IEM3 shape: ',IEM_a3.shape)
         IEM_a4 = self.IEM4(conv1_l1_)
-        #print('IEM4 shape: ',IEM_a4.shape)
+        print('IEM4 shape: ',IEM_a4.shape)
         
         att1 = self.out_att1(l2_upsample)
-        #print('att1 shape: ',att1.shape)
+        print('att1 shape: ',att1.shape)
         z1 = att1 + l2_upsample
-        #print('z1 shape: ',z1.shape)
+        print('z1 shape: ',z1.shape)
         z2 = self.conv2_l1(z1)
-        #print('z2 shape: ',z2.shape)
+        print('z2 shape: ',z2.shape)
         
         IEM_concat = torch.cat([z2, IEM_a1, IEM_a2, IEM_a3, IEM_a4], dim=1)
         print('IEM_concat shape: ',IEM_concat.shape)
         z3 = self.conv3_l1(IEM_concat)
         print('z3 shape: ',z3.shape)
-        z4=self.conv3_l1(z3)
-        print('z4 shape: ',z4.shape) 
-        pixel_shuffle = self.pix_shuff(z4)
+        pixel_shuffle = self.pix_shuff(z3)
         print('pixel shuffle_shape: ', pixel_shuffle.shape)
         out = self.act1(self.conv4_l1(pixel_shuffle))
         print('out shape: ',out.shape)
@@ -219,17 +217,19 @@ class ConvLayer(nn.Module):
         return out
     
 class depthwise_conv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size):
+    def __init__(self, input_channels, output_channels, kernel_size, dilation_dw):
         super(depthwise_conv, self).__init__()
 
-        print('in_channels: ',in_channels)
-        print('out_channels: ',out_channels)
+        print('in_channels: ',input_channels)
+        print('out_channels: ',output_channels)
         print('kernel_size: ',kernel_size)
-        reflection_padding = 2*(kernel_size//2)
         
+        reflection_padding = (kernel_size//2)
+        if dilation_dw == 2:
+          reflection_padding= 2*reflection_padding
         self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
-        self.dw_conv =  nn.Sequential(nn.Conv2d(in_channels, out_channels, kernel_size, dilation=2, groups=in_channels),nn.ReLU())
-        self.point_conv = nn.Conv2d(out_channels , out_channels, kernel_size=1)
+        self.dw_conv =  nn.Sequential(nn.Conv2d(input_channels, output_channels, kernel_size, stride = 1, dilation=dilation_dw, groups=input_channels),nn.ReLU())
+        self.point_conv = nn.Conv2d(output_channels , output_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
     def forward(self, x):
         
