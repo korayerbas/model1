@@ -109,39 +109,39 @@ class model1(nn.Module):
     
     def level_1(self, conv1_l1_, l2_upsample, x):
         
-        print('conv1_l1 shape: ', conv1_l1_.shape)
-        print('l2_upsample',l2_upsample.shape)
-        print('x shape',x.shape)
+        #print('conv1_l1 shape: ', conv1_l1_.shape)
+        #print('l2_upsample',l2_upsample.shape)
+        #print('x shape',x.shape)
         #a1 = self.conv1_IEM(x)
         #print('conv1 shape: ',a1.shape)
         #IEM_a1 = self.IEM1(a1)
         #print('IEM1 shape: ',IEM_a1.shape)
         a2 = self.conv2_IEM(x)
-        print('conv2 shape: ',a2.shape)
+        #print('conv2 shape: ',a2.shape)
         IEM_a2 = self.IEM2(a2)
-        print('IEM2 shape: ',IEM_a2.shape)
+        #print('IEM2 shape: ',IEM_a2.shape)
         #a3 = self.conv3_IEM(x)
         #print('conv3 shape: ',a3.shape)
         #IEM_a3 = self.IEM3(a3)
         #print('IEM3 shape: ',IEM_a3.shape)
         IEM_a4 = self.IEM4(conv1_l1_)
-        print('IEM4 shape: ',IEM_a4.shape)
+        #print('IEM4 shape: ',IEM_a4.shape)
         
         att1 = self.out_att1(l2_upsample)
-        print('att1 shape: ',att1.shape)
+        #print('att1 shape: ',att1.shape)
         z1 = att1 + l2_upsample
-        print('z1 shape: ',z1.shape)
+        #print('z1 shape: ',z1.shape)
         #z2 = self.conv2_l1(z1)
         #print('z2 shape: ',z2.shape)
         
         IEM_concat = torch.cat([z1, IEM_a2, IEM_a4], dim=1)
-        print('IEM_concat shape: ',IEM_concat.shape)
+        #print('IEM_concat shape: ',IEM_concat.shape)
         z3 = self.conv3_l1(IEM_concat)
-        print('z3 shape: ',z3.shape)
+        #print('z3 shape: ',z3.shape)
         pixel_shuffle = self.pix_shuff(z3)
-        print('pixel shuffle_shape: ', pixel_shuffle.shape)
+        #print('pixel shuffle_shape: ', pixel_shuffle.shape)
         out = self.act1(self.conv4_l1(pixel_shuffle))
-        print('out shape: ',out.shape)
+        #print('out shape: ',out.shape)
         return out
               
     def forward(self, x):
@@ -218,9 +218,9 @@ class depthwise_conv(nn.Module):
     def __init__(self, input_channels, output_channels, kernel_size, dilation_dw):
         super(depthwise_conv, self).__init__()
 
-        print('in_channels: ',input_channels)
-        print('out_channels: ',output_channels)
-        print('kernel_size: ',kernel_size)
+        #print('in_channels: ',input_channels)
+        #print('out_channels: ',output_channels)
+        #print('kernel_size: ',kernel_size)
         
         reflection_padding = (kernel_size//2)
         if dilation_dw == 2:
@@ -232,11 +232,11 @@ class depthwise_conv(nn.Module):
     def forward(self, x):
         
         y = self.reflection_pad(x)
-        print('y_depthwise shape: ',y.shape)
+        #print('y_depthwise shape: ',y.shape)
         conv1 = self.dw_conv(y)
-        print('depthwise_conv shape: ',conv1.shape)
+        #print('depthwise_conv shape: ',conv1.shape)
         conv2 = self.point_conv(conv1)
-        print('point_conv shape: ',conv2.shape)
+        #print('point_conv shape: ',conv2.shape)
         out = self.sigmoid(conv2)
         return out
     
