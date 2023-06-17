@@ -32,7 +32,7 @@ if level == 3:
 elif level == 2:
     dslr_scale = 1/2
 elif level == 1:
-    dslr_scale = 1
+    dslr_scale = 2
 else:
     print("undefined level !!!")
 
