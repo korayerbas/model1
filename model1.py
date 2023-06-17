@@ -137,15 +137,15 @@ class model1(nn.Module):
         #print('z2 shape: ',z2.shape)
         
         IEM_concat = torch.cat([z2, IEM_a1, IEM_a2, IEM_a3, IEM_a4], dim=1)
-        #print('IEM_concat shape: ',IEM_concat.shape)
+        print('IEM_concat shape: ',IEM_concat.shape)
         z3 = self.conv3_l1(IEM_concat)
-        #print('z1_l1 shape: ',z1_l1.shape)
+        print('z3 shape: ',z3.shape)
         z4=self.conv3_l1(z3)
-        #print('z4 shape: ',z4.shape) 
+        print('z4 shape: ',z4.shape) 
         pixel_shuffle = self.pix_shuff(z4)
-        #print('pixel shuffle_shape: ', pixel_shuffle.shape)
+        print('pixel shuffle_shape: ', pixel_shuffle.shape)
         out = self.act1(self.conv4_l1(pixel_shuffle))
-        #print('out shape: ',out.shape)
+        print('out shape: ',out.shape)
         return out
               
     def forward(self, x):
@@ -221,22 +221,24 @@ class ConvLayer(nn.Module):
 class depthwise_conv(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size):
         super(depthwise_conv, self).__init__()
-        
-        #print('kernel_size: ',kernel_size)
+
+        print('in_channels: ',in_channels)
+        print('out_channels: ',out_channels)
+        print('kernel_size: ',kernel_size)
         reflection_padding = 2*(kernel_size//2)
         
         self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
         self.dw_conv =  nn.Sequential(nn.Conv2d(in_channels, out_channels, kernel_size, dilation=2, groups=in_channels),nn.ReLU())
-        self.point_conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+        self.point_conv = nn.Conv2d(out_channels , out_channels, kernel_size=1)
         self.sigmoid = nn.Sigmoid()
     def forward(self, x):
         
         y = self.reflection_pad(x)
-        #print('y_depthwise shape: ',y.shape)
+        print('y_depthwise shape: ',y.shape)
         conv1 = self.dw_conv(y)
-        #print('depthwise_conv shape: ',conv1.shape)
+        print('depthwise_conv shape: ',conv1.shape)
         conv2 = self.point_conv(conv1)
-        #print('point_conv shape: ',conv2.shape)
+        print('point_conv shape: ',conv2.shape)
         out = self.sigmoid(conv2)
         return out
     
